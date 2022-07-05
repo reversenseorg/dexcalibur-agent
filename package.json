@@ -1,0 +1,28 @@
+{
+  "name": "dexcalibur-agent",
+  "version": "1.0.0",
+  "description": "The dexcalibur agent-side lib",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://git.jetbrains.space/reversense/dxc/dexcalibur-agent.git"
+  },
+  "keywords": [
+    "frida",
+    "strace",
+    "syscall",
+    "hook",
+    "drcov",
+    "coverage"
+  ],
+  "author": "Georges-Bastien Michel <georges@reversense.com>",
+  "license": "Copyright",
+  "devDependencies": {
+    "@types/frida-gum": "^17.3.0",
+    "@types/node": "^17.0.10",
+    "typescript": "^4.5.4"
+  }
+}
