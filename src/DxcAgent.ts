@@ -1,4 +1,7 @@
 import {target} from "../../interruptor/index"
+import {DxcJava} from "./DxcJava";
+import {DxcUtils} from "./DxcUtils";
+
 
 /**
  *
@@ -10,6 +13,9 @@ export class DxcAgent {
     tracers:any[] = [];
     hooks:any = {};
     callbacks:any = {};
+
+    util:DxcUtils = new DxcUtils();
+    java:DxcJava = new DxcJava();
 
 
     constructor( pTracerFactory:any) {
@@ -102,13 +108,24 @@ export class DxcAgent {
     }
 
     start():void{
-        this.tracers.map( x => {
+        /*this.tracers.map( x => {
 
-        })
+        })*/
     }
 
-    send( pHookId:string, pInfo:any){
-        pInfo.id = pHookId;
-        send()
+    /**
+     * To send a message to the host script
+     *
+     * @param {string} pHookId Hook ID
+     * @param {string} pFragmentId Fragment ID
+     * @param {any} pInfo Data
+     * @method
+     */
+    send( pHookId:string, pFragmentId:string, pInfo:any){
+        send({
+            hid: pHookId,
+            fid: pFragmentId,
+            data: pInfo
+        })
     }
 }
