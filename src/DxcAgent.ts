@@ -1,6 +1,9 @@
 import {target} from "../../interruptor/index"
 import {DxcJava} from "./DxcJava";
 import {DxcUtils} from "./DxcUtils";
+import {NodeInternalType} from "./core/NodeInternalType";
+import {CoreClassLoader} from "./core/CoreClassLoader";
+import {DxcFactory} from "./DxcFactory";
 
 
 /**
@@ -9,10 +12,17 @@ import {DxcUtils} from "./DxcUtils";
  */
 export class DxcAgent {
 
+    private _factory:DxcFactory = null;
+
     tracerFactory:any;
     tracers:any[] = [];
     hooks:any = {};
     callbacks:any = {};
+    classLoader:any = {};
+    modifier:any = {};
+
+
+    NODE:any = NodeInternalType;
 
     util:DxcUtils = new DxcUtils();
     java:DxcJava = new DxcJava();
@@ -20,6 +30,8 @@ export class DxcAgent {
 
     constructor( pTracerFactory:any) {
         this.tracerFactory = pTracerFactory;
+        this.classLoader = new CoreClassLoader();
+        this._factory = new DxcFactory(this);
     }
 
 
@@ -75,31 +87,24 @@ export class DxcAgent {
      * @param pHook
      */
     onDlOpenOf( pFilePattern:RegExp, pHook: any){
-        if(!this.hooks.dl_open){
-            this.callbacks.dl_open = [];
-            Interceptor.attach(
-                Module.findExportByName('libdl.so', 'dlopen'),
-                {
-                    onEnter: function(args){
-                        const lib = args[0].readUtf8String();
-                        this.callbacks.dl_open.map( (pOpt:any)=>{
-                            if(pOpt.pattern.test(lib)){
-                                (pOpt.cb)(this, args, lib);
-                            }
-                        })
-                    }
-                }
-            )
-        }
+        this._factory.dl_open.push( { path:pFilePattern, cb:pHook });
+    }
 
+    onClassDefine( pClass:string, pCallback:any){
+        this._factory.defines.classes.push( { fqcn:pClass, cb:pCallback });
+    }
 
-        this.callbacks.dl_open.push({
-            pattern: pFilePattern,
-            cb: pHook
-        });
+    onFieldDefine( pClass:string, pCallback:any){
 
     }
 
+    onMethodDefine( pMethod:any, pCallback:any){
+
+    }
+
+    onModifierChange( pField:any, pCallback:any){
+
+    }
 
     onSyscall( pSyscall:string, pCondition:any, pCallback:any){
         //if(this.isModuleTraced(pModule)){
@@ -107,10 +112,22 @@ export class DxcAgent {
         //}
     }
 
-    start():void{
-        /*this.tracers.map( x => {
+    beforeAppStart( pCallback:any):void {
+        this._factory._early.push(pCallback);
+    }
 
-        })*/
+    /**
+     * To add a function / code block called inside Java.perform()
+     *
+     * @param pCallback
+     */
+    onAppStarted( pCallback:any):void {
+        this._factory._run.push(pCallback);
+    }
+
+    start():void{
+        this._factory.load();
+
     }
 
     /**
