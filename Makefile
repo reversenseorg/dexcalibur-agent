@@ -2,7 +2,7 @@ VERSION=1.0.0
 
 
 clean:
-	rm -r ./dist
+	rm -rf ./dist
 
 compile: clean
 	npx tsc
