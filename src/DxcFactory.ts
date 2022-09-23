@@ -1,8 +1,3 @@
-import {target} from "../../interruptor/index"
-import {DxcJava} from "./DxcJava";
-import {DxcUtils} from "./DxcUtils";
-import {NodeInternalType} from "./core/NodeInternalType";
-import {CoreClassLoader} from "./core/CoreClassLoader";
 import {DxcAgent} from "./DxcAgent";
 
 

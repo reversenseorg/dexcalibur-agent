@@ -1,5 +1,5 @@
 import {DxcAgent} from "./src/DxcAgent";
-import * as InterruptorLib from "../interruptor/index.linux.x64"
+import * as InterruptorLib from "@reversense/interruptor/index.linux.x64"
 
 // To create a Dexcalibur's agent with x64 syscall hooking ability
 export  const newDxcAgent = (function( pOptions:any){
