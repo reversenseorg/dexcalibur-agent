@@ -30,6 +30,6 @@
     "@npm/typescript": "^4.5.4"
   },
   "dependencies": {
-    "@dexcalibur/interruptor": "^1.0.0"
+    "interruptor": "^1.0.0"
   }
 }
