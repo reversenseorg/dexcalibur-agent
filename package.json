@@ -4,7 +4,11 @@
   "description": "The dexcalibur agent-side lib",
   "main": "index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npx tsc",
+    "pack-generic": "npx webpack --config webpack.android.config.js",
+    "pack-x64": "npx webpack --config webpack.android.x64.config.js",
+    "pack-arm64": "npx webpack --config webpack.android.arm64.config.js"
   },
   "repository": {
     "type": "git",
@@ -24,5 +28,8 @@
     "@types/frida-gum": "^17.3.0",
     "@types/node": "^17.0.10",
     "typescript": "^4.5.4"
+  },
+  "dependencies": {
+    "@dexcalibur/interruptor": "^1.0.0"
   }
 }
