@@ -25,8 +25,8 @@
   "author": "Georges-Bastien Michel <georges@reversense.com>",
   "license": "Copyright",
   "devDependencies": {
-    "@npm/@types/frida-gum": "^17.3.0",
-    "@npm/@types/node": "^17.0.10",
+    "@types/frida-gum": "^17.3.0",
+    "@types/node": "^17.0.10",
     "@npm/typescript": "^4.5.4"
   },
   "dependencies": {
