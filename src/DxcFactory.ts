@@ -54,7 +54,7 @@ export class DxcFactory {
      */
     private _hookClassDefine(){
         let CL = null;
-        for(let k in this._agent.classLoader){
+        for(const k in this._agent.classLoader){
             CL = this._agent.classLoader[k];
             CL.defineClass.overload();
         }
