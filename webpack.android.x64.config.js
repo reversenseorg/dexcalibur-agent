@@ -1,7 +1,7 @@
 const path = require('path');
 
 module.exports = {
-    entry: './dist/dexcalibur-agent/index.android.x64.js',
+    entry: './dist/index.android.x64.js',
     // devtool: 'inline-source-map',
     target: 'node',
     mode: 'production',
