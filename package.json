@@ -30,6 +30,6 @@
     "typescript": "^4.5.4"
   },
   "dependencies": {
-    "@reversense/interruptor": "^1.0.0"
+    "@reversense/interruptor": ">=1.0.6"
   }
 }
