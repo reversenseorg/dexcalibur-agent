@@ -3,7 +3,17 @@ import {DxcUtils} from "./DxcUtils";
 import {NodeInternalType} from "./core/NodeInternalType";
 import {CoreClassLoader} from "./core/CoreClassLoader";
 import {DxcFactory} from "./DxcFactory";
+import {SyscallCondition} from "./core/SyscallCondition";
 
+export interface SystemCallHookOptions {
+    file?:RegExp|string;
+    args?:any;
+    ret:any;
+}
+
+export interface TracedModule {
+    [syscallName:string] :SystemCallHookOptions
+}
 
 /**
  *
@@ -19,6 +29,7 @@ export class DxcAgent {
     callbacks:any = {};
     classLoader:any = {};
     modifier:any = {};
+    mods:any = {};
 
 
     NODE:any = NodeInternalType;
@@ -105,7 +116,18 @@ export class DxcAgent {
 
     }
 
-    onSyscall( pSyscall:string, pCondition:any, pCallback:any){
+    onSyscall( pSyscall:string, pCondition:SyscallCondition, pCallback:any){
+
+
+        //this._factory.dl_open.push( { path:pFilePattern, cb:pHook });
+
+        if(pCondition.module!=null){
+
+        }
+
+        if(pCondition.module!=null){
+
+        }
         //if(this.isModuleTraced(pModule)){
 
         //}

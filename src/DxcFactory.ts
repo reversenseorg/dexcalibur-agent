@@ -12,6 +12,7 @@ export class DxcFactory {
     _run:any[] = [];
 
     dl_open:any = [];
+    read:any = [];
     modifiers:any = [];
     defines:any = {
         classes: [],
