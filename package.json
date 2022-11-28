@@ -1,14 +1,15 @@
 {
-  "name": "dexcalibur-agent",
+  "name": "@dexcalibur/dexcalibur-agent",
   "version": "1.0.0",
   "description": "The dexcalibur agent-side lib",
   "main": "index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npx tsc",
+    "build": "npx tsc --project tsconfig.lib.json",
     "pack-generic": "npx webpack --config webpack.android.config.js",
     "pack-x64": "npx webpack --config webpack.android.x64.config.js",
-    "pack-arm64": "npx webpack --config webpack.android.arm64.config.js"
+    "pack-arm64": "npx webpack --config webpack.android.arm64.config.js",
+    "cleanup": "rm -r ./dist"
   },
   "repository": {
     "type": "git",
@@ -30,6 +31,7 @@
     "typescript": "^4.5.4"
   },
   "dependencies": {
-    "@reversense/interruptor": ">=1.0.6"
-  }
+    "@reversense/interruptor": "^1.0.6"
+  },
+  "type": "module"
 }

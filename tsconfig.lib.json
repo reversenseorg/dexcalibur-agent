@@ -2,10 +2,13 @@
   "compilerOptions": {
     "lib": ["es2017"],
     "target": "es2017", // es2017
-    "module": "commonjs",
+    "module": "ES2020",
     "declaration": true,
     "outDir": "./dist",
     "removeComments": true,
+    "strictNullChecks": false,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
     "sourceMap": false,
     "typeRoots": [
       "node_modules/@types"
@@ -19,5 +22,10 @@
     "src/**/*.ts",
     "*.ts"
   ],
-  "exclude": ["node_modules", "**/*.spec.ts"]
+  "exclude": [
+    "node_modules",
+    "**/*.spec.ts",
+    "*.script.ts",
+    "**/*.script.ts"
+  ]
 }
