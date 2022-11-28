@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-module.exports = {
+let config = {
     entry: './dist/index.android.js',
     // devtool: 'inline-source-map',
     target: 'node',
@@ -14,3 +14,4 @@ module.exports = {
         }
     },
 };
+export default config;
