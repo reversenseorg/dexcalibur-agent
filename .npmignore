@@ -1,0 +1,6 @@
+./dist/**
+./examples/**
+./lib/**
+./old_dist/**
+.npmrc
+.DS_Store
