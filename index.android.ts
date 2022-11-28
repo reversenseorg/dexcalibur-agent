@@ -1,4 +1,4 @@
-import {DxcAgent} from "./src/DxcAgent";
+import {DxcAgent} from "./src/DxcAgent.js";
 
 // To create a Dexcalibur's agent without syscall hooking ability
 export  const newDxcAgent = (function( pOptions:any){

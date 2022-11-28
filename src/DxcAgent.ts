@@ -1,9 +1,9 @@
-import {DxcJava} from "./DxcJava";
-import {DxcUtils} from "./DxcUtils";
-import {NodeInternalType} from "./core/NodeInternalType";
-import {CoreClassLoader} from "./core/CoreClassLoader";
-import {DxcFactory} from "./DxcFactory";
-import {SyscallCondition} from "./core/SyscallCondition";
+import {DxcJava} from "./DxcJava.js";
+import {DxcUtils} from "./DxcUtils.js";
+import {NodeInternalType} from "./core/NodeInternalType.js";
+import {CoreClassLoader} from "./core/CoreClassLoader.js";
+import {DxcFactory} from "./DxcFactory.js";
+import {SyscallCondition} from "./core/SyscallCondition.js";
 
 export interface SystemCallHookOptions {
     file?:RegExp|string;

@@ -1,4 +1,4 @@
-import {DxcAgent} from "./DxcAgent";
+import {DxcAgent} from "./DxcAgent.js";
 
 
 /**
