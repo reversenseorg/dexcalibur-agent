@@ -11,6 +11,12 @@
     "pack-arm64": "npx webpack --config webpack.android.arm64.config.js",
     "cleanup": "rm -r ./dist"
   },
+  "files": [
+    "src/**/*.d.ts",
+    "src/**/*.js",
+    "*.d.ts",
+    "*.js"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://git.jetbrains.space/reversense/dxc/dexcalibur-agent.git"
