@@ -26,6 +26,7 @@
     "node_modules",
     "**/*.spec.ts",
     "*.script.ts",
-    "**/*.script.ts"
+    "**/*.script.ts",
+    "tests/**/*.ts"
   ]
 }

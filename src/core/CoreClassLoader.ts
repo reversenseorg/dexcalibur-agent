@@ -4,6 +4,8 @@ export class CoreClassLoader {
 
     cl:any = {};
 
+    tech:string;
+
     constructor() {
         this.refresh();
     }

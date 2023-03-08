@@ -4,6 +4,9 @@ import {NodeInternalType} from "./core/NodeInternalType.js";
 import {CoreClassLoader} from "./core/CoreClassLoader.js";
 import {DxcFactory} from "./DxcFactory.js";
 import {SyscallCondition} from "./core/SyscallCondition.js";
+import {ADAPTER, IAdapterAgent} from "./core/const";
+import {DxcJavaAgent} from "./techs/java/DxcJavaAgent";
+import {DxcObjcAgent} from "./techs/objc/DxcObjcAgent";
 
 export interface SystemCallHookOptions {
     file?:RegExp|string;
@@ -15,6 +18,9 @@ export interface TracedModule {
     [syscallName:string] :SystemCallHookOptions
 }
 
+interface AdapterMap {
+    [adapterName:string] :IAdapterAgent;
+}
 /**
  *
  * @class
@@ -22,6 +28,9 @@ export interface TracedModule {
 export class DxcAgent {
 
     private _factory:DxcFactory = null;
+
+    private _java:DxcAgent|null = null;
+    private _objc:DxcAgent|null = null;
 
     tracerFactory:any;
     tracers:any[] = [];
@@ -35,8 +44,11 @@ export class DxcAgent {
     NODE:any = NodeInternalType;
 
     util:DxcUtils = new DxcUtils();
-    java:DxcJava = new DxcJava();
+    __java:DxcJava = new DxcJava();
 
+    adapters:AdapterMap = {
+
+    }
 
     constructor( pTracerFactory:any) {
         this.tracerFactory = pTracerFactory;
@@ -44,6 +56,22 @@ export class DxcAgent {
         this._factory = new DxcFactory(this);
     }
 
+    java():DxcJavaAgent {
+        if(this.adapters[ADAPTER.JAVA]==null){
+            this.adapters[ADAPTER.JAVA] = new DxcJavaAgent(this);
+        }
+
+        return this.adapters[ADAPTER.JAVA] as DxcJavaAgent;
+    }
+
+
+    objc():DxcObjcAgent {
+        if(this.adapters[ADAPTER.OBJC]==null){
+            this.adapters[ADAPTER.OBJC] = new DxcObjcAgent(this);
+        }
+
+        return this.adapters[ADAPTER.OBJC] as DxcObjcAgent;
+    }
 
     /**
      * To create and configure a new syscall tracer, but not load it
@@ -61,34 +89,7 @@ export class DxcAgent {
         return t;
     }
 
-    /**
-     * To get the class loader associated to a file or a buffer
-     *
-     * @param pFile
-     */
-    loaderOf(pFile:string):any{
-        const cl = Java.enumerateClassLoadersSync();
-        for(let i=0; i<cl.length; i++){
-            // if(cl)
-        }
 
-        return null;
-    }
-
-    use(pFQCN:string):any{
-        return null;
-    }
-
-
-    getClassLoaderOf():any {
-        Java.enumerateClassLoadersSync().map( vLoader => {
-            //if(loader)
-        });
-    }
-
-    getDefaultClassLoader():any{
-        return null;
-    }
 
 
     /**
@@ -100,21 +101,6 @@ export class DxcAgent {
         this._factory.dl_open.push( { path:pFilePattern, cb:pHook });
     }
 
-    onClassDefine( pClass:string, pCallback:any){
-        this._factory.defines.classes.push( { fqcn:pClass, cb:pCallback });
-    }
-
-    onFieldDefine( pClass:string, pCallback:any){
-
-    }
-
-    onMethodDefine( pMethod:any, pCallback:any){
-
-    }
-
-    onModifierChange( pField:any, pCallback:any){
-
-    }
 
     onSyscall( pSyscall:string, pCondition:SyscallCondition, pCallback:any){
 
@@ -164,6 +150,21 @@ export class DxcAgent {
             hid: pHookId,
             fid: pFragmentId,
             data: pInfo
+        })
+    }
+
+    /**
+     * To create a kind of interactive terminal to
+     * explore the application context interactively
+     *
+     * @method
+     */
+    startInteractiveSession(){
+        send({
+            type: "interactiv_new",
+            data: {
+                session:null
+            }
         })
     }
 }
