@@ -1,6 +1,6 @@
-import { IOopAgent } from "../../core/IOopAgent";
-import {DxcAgent} from "../../DxcAgent";
-import {STEP} from "../../core/const";
+import { IOopAgent } from "../../core/IOopAgent.js";
+import {DxcAgent} from "../../DxcAgent.js";
+import {STEP} from "../../core/const.js";
 
 
 export class DxcObjcAgent implements IOopAgent {
@@ -36,27 +36,6 @@ export class DxcObjcAgent implements IOopAgent {
     }
 
     load(){
-        if(this.defines.classes.length > 0)
-            this._hookClassDefine();
-        //if(this.defines.method.length > 0) this._hookMethodDefine();
-        //if(this.defines.field.length > 0) this._hookFieldDefine();
-        //if(this.modifiers.length > 0)
 
-
-        if(this._early.length > 0){
-            Java.performNow(()=>{
-                this._early.map( x => {
-                    x.call( null, this );
-                })
-            });
-        }
-
-        Java.perform(()=>{
-            this._agent.classLoader.refresh();
-
-            this._run.map( x => {
-                x.call( null, this );
-            });
-        });
     }
 }

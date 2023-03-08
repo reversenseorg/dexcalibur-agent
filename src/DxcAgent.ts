@@ -1,12 +1,12 @@
-import {DxcJava} from "./DxcJava.js";
+
 import {DxcUtils} from "./DxcUtils.js";
 import {NodeInternalType} from "./core/NodeInternalType.js";
 import {CoreClassLoader} from "./core/CoreClassLoader.js";
 import {DxcFactory} from "./DxcFactory.js";
 import {SyscallCondition} from "./core/SyscallCondition.js";
-import {ADAPTER, IAdapterAgent} from "./core/const";
-import {DxcJavaAgent} from "./techs/java/DxcJavaAgent";
-import {DxcObjcAgent} from "./techs/objc/DxcObjcAgent";
+import {ADAPTER, IAdapterAgent} from "./core/const.js";
+import {DxcJavaAgent} from "./techs/java/DxcJavaAgent.js";
+import {DxcObjcAgent} from "./techs/objc/DxcObjcAgent.js";
 
 export interface SystemCallHookOptions {
     file?:RegExp|string;
@@ -44,7 +44,7 @@ export class DxcAgent {
     NODE:any = NodeInternalType;
 
     util:DxcUtils = new DxcUtils();
-    __java:DxcJava = new DxcJava();
+    //__java:DxcJava = new DxcJava();
 
     adapters:AdapterMap = {
 

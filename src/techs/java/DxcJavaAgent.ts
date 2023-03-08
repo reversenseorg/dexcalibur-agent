@@ -1,7 +1,7 @@
-import {STEP} from "../../core/const";
-import {IOopAgent} from "../../core/IOopAgent";
-import {DxcAgent} from "../../DxcAgent";
-import {CoreClassLoader} from "../../core/CoreClassLoader";
+import {STEP} from "../../core/const.js";
+import {IOopAgent} from "../../core/IOopAgent.js";
+import {DxcAgent} from "../../DxcAgent.js";
+import {CoreClassLoader} from "../../core/CoreClassLoader.js";
 
 
 export class DxcJavaAgent implements IOopAgent {
