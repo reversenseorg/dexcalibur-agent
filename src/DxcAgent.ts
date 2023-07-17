@@ -56,6 +56,12 @@ export class DxcAgent {
         this._factory = new DxcFactory(this);
     }
 
+    /**
+     * To get Java Dexcalibur API
+     *
+     * @return {DxcObjcAgent}
+     * @method
+     */
     java():DxcJavaAgent {
         if(this.adapters[ADAPTER.JAVA]==null){
             this.adapters[ADAPTER.JAVA] = new DxcJavaAgent(this);
@@ -64,7 +70,22 @@ export class DxcAgent {
         return this.adapters[ADAPTER.JAVA] as DxcJavaAgent;
     }
 
+    /*
+    react():DxcJavaAgent {
+        if(this.adapters[ADAPTER.JAVA]==null){
+            this.adapters[ADAPTER.JAVA] = new DxcJavaAgent(this);
+        }
 
+        return this.adapters[ADAPTER.JAVA] as DxcJavaAgent;
+    }
+
+
+    /**
+     * To get Objective-C Dexcalibur API
+     *
+     * @return {DxcObjcAgent}
+     * @method
+     */
     objc():DxcObjcAgent {
         if(this.adapters[ADAPTER.OBJC]==null){
             this.adapters[ADAPTER.OBJC] = new DxcObjcAgent(this);
@@ -124,7 +145,9 @@ export class DxcAgent {
     }
 
     /**
-     * To add a function / code block called inside Java.perform()
+     * To add a function / code block called inside
+     *
+     * Android App : from Java.perform()
      *
      * @param pCallback
      */

@@ -62,6 +62,11 @@ export class DxcJava {
         return msg;
     }
 
+    /**
+     * To read a file using Java FileInputStream
+     *
+     * @param pInputFile
+     */
     readFile(pInputFile){
 
         const fin = this.class.java.io.FileInputStream.$new(pInputFile);
@@ -105,6 +110,7 @@ export class DxcJava {
 
     /**
      * Cast as an array of object of <pClass>
+     *
      * @param pClass
      * @param pArr
      */
@@ -123,16 +129,24 @@ export class DxcJava {
         return ret;
     }
 
-    getMethodSignature(method,argTypes){
+    /**
+     * To generate method signature compliant with Dexcalibur format
+     *
+     * @param {any} pMethod Instance of java.lang.Method class
+     * @param {any} pArgTypes Array of instance of java.lang.Class class
+     * @return {string} The method signature
+     * @method
+     */
+    getMethodSignature( pMethod:any, pArgTypes:any):string{
         let sign ="";
 
-        const cls = Java.cast( method.getDeclaringClass(), this.class.java.lang.Class);
-        const args = this.castArray( this.class.java.lang.Class, argTypes); // method.getParameterTypes());
-        const rett = Java.cast( method.getReturnType(), this.class.java.lang.Class);
+        const cls = Java.cast( pMethod.getDeclaringClass(), this.class.java.lang.Class);
+        const args = this.castArray( this.class.java.lang.Class, pArgTypes); // method.getParameterTypes());
+        const rett = Java.cast( pMethod.getReturnType(), this.class.java.lang.Class);
 
         sign += cls.getCanonicalName();
         sign += ".";
-        sign += method.getName();
+        sign += pMethod.getName();
         sign += "(";
 
         if(args!==null)
