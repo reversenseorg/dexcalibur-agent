@@ -177,6 +177,42 @@ export class DxcAgent {
     }
 
     /**
+     * To send an error message when a hook cannot be
+     *  loaded.
+     *
+     * @param {string} pErrCode Error code must be upper than 0, to be caught
+     * @param {string} pHookId Hook ID
+     * @param {any} pInfo Data
+     * @method
+     */
+    sendDefinitionError( pErrCode:number, pHookId:string, pMsg:any){
+        send({
+            err: pErrCode,
+            hid: pHookId,
+            data: pMsg
+        })
+    }
+
+    /**
+     * To send an error message when a fragment cannot be
+     *  satisfied.
+     *
+     * @param {string} pErrCode Error code must be negative and lower than 0, to be caught as fragment error
+     * @param {string} pHookId Hook ID
+     * @param {string} pFragmentId Fragment ID
+     * @param {any} pInfo Data
+     * @method
+     */
+    sendFragmentError( pErrCode:number, pHookId:string, pFragmentId:string, pMsg:any){
+        send({
+            err: pErrCode,
+            hid: pHookId,
+            fid: pFragmentId,
+            data: pMsg
+        })
+    }
+
+    /**
      * To create a kind of interactive terminal to
      * explore the application context interactively
      *
