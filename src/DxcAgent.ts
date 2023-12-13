@@ -173,7 +173,7 @@ export class DxcAgent {
             hid: pHookId,
             fid: pFragmentId,
             data: pInfo
-        })
+        });
     }
 
     /**
@@ -190,7 +190,7 @@ export class DxcAgent {
             err: pErrCode,
             hid: pHookId,
             data: pMsg
-        })
+        });
     }
 
     /**
@@ -209,7 +209,7 @@ export class DxcAgent {
             hid: pHookId,
             fid: pFragmentId,
             data: pMsg
-        })
+        });
     }
 
     /**
