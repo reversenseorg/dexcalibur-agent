@@ -11,14 +11,20 @@ export class DxcUtils {
         return str;
     }
 
-    isInstanceOf(raw_ref:any, fqcn:any):boolean{
-        if(raw_ref == null) return false;
-
-        if(typeof raw_ref != "string"){
-            let cls = Java.cast(raw_ref.getClass(), this._class);
-            return (cls.getCanonicalName()==fqcn);
-        }else{
-            return ("java.lang.String"==fqcn);
+    isInstanceOf(raw_ref:any, fqcn:any) {
+        if (raw_ref == null)
+            return false;
+        switch(typeof raw_ref){
+            case "string":
+                return ("java.lang.String" === fqcn);
+            default:
+                if (typeof raw_ref.getClass === 'function') {
+                    let cls = Java.cast(raw_ref.getClass(), Java.use("java.lang.Class"));
+                    return (cls.getCanonicalName() === fqcn);
+                } else {
+                    // TODO: Check if other type are needed. if raw_ref is boolean or number
+                    return false
+                }
         }
     }
 }
