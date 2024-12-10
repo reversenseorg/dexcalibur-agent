@@ -84,8 +84,8 @@ export class DxcJava {
             }
         }while(b != -1);
 
-
-        console.log("finished flatting array");
+        fin.close();
+        console.log("Finished flatting array");
         return content;
     }
 

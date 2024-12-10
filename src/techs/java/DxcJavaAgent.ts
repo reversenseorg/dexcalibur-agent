@@ -3,12 +3,14 @@ import {IOopAgent} from "../../core/IOopAgent.js";
 import {DxcAgent} from "../../DxcAgent.js";
 import {CoreClassLoader} from "../../core/CoreClassLoader.js";
 import {DxcJava} from "./DxcJava.js";
+import {DxcJavaUI} from "./DxcJavaUI";
 
 
 export class DxcJavaAgent implements IOopAgent {
 
     private _parent:DxcAgent;
     private _javaAPI:DxcJava;
+    private _javaUI_API:DxcJavaUI;
     private _early:any = [];
 
     modifiers:any = [];
@@ -26,6 +28,7 @@ export class DxcJavaAgent implements IOopAgent {
     constructor(pParent:DxcAgent) {
         this._parent = pParent;
         this._javaAPI = new DxcJava();
+        this._javaUI_API = new DxcJavaUI(pParent);
         this.class = this._javaAPI.class;
     }
 
@@ -181,5 +184,9 @@ export class DxcJavaAgent implements IOopAgent {
      */
     getMethodSignature( pMethod:any, pArgTypes:any):string{
         return this._javaAPI.getMethodSignature(pMethod,pArgTypes);
+    }
+
+    get ui(): DxcJavaUI {
+        return this._javaUI_API;
     }
 }

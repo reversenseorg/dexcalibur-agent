@@ -21,6 +21,15 @@ export interface TracedModule {
 interface AdapterMap {
     [adapterName:string] :IAdapterAgent;
 }
+
+export enum BUS_EVENT {
+    VIEW_HIERARCHY = "agent.ui.view_hierarchy",
+}
+
+export enum TECH_TYPE {
+    JAVA= "java",
+}
+
 /**
  *
  * @class
@@ -62,7 +71,7 @@ export class DxcAgent {
      * @return {DxcObjcAgent}
      * @method
      */
-    java():DxcJavaAgent {
+    get java():DxcJavaAgent {
         if(this.adapters[ADAPTER.JAVA]==null){
             this.adapters[ADAPTER.JAVA] = new DxcJavaAgent(this);
         }
@@ -173,6 +182,21 @@ export class DxcAgent {
             hid: pHookId,
             fid: pFragmentId,
             data: pInfo
+        });
+    }
+
+
+    /**
+     * To push an event into the host bus.
+     *
+     * @param {string} evt The name of the event to be sent
+     * @param {any} data The data to be sent
+     * @method
+     */
+    push(evt:BUS_EVENT, data:any){
+        send({
+            evt: evt,
+            data: data
         });
     }
 
