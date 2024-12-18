@@ -52,7 +52,7 @@ export class DxcAgent {
 
     NODE:any = NodeInternalType;
 
-    util:DxcUtils = new DxcUtils();
+    utils:DxcUtils = new DxcUtils();
     //__java:DxcJava = new DxcJava();
 
     adapters:AdapterMap = {
