@@ -3,7 +3,7 @@ import {IOopAgent} from "../../core/IOopAgent.js";
 import {DxcAgent} from "../../DxcAgent.js";
 import {CoreClassLoader} from "../../core/CoreClassLoader.js";
 import {DxcJava} from "./DxcJava.js";
-import {DxcJavaUI} from "./DxcJavaUI";
+import {DxcJavaUI} from "./DxcJavaUI.js";
 
 
 export class DxcJavaAgent implements IOopAgent {

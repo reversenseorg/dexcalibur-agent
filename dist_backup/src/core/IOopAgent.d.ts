@@ -1,4 +1,4 @@
-import { IAdapterAgent, STEP } from "./const";
+import { IAdapterAgent, STEP } from "./const.js";
 export interface IOopAgent extends IAdapterAgent {
     onClassDefine(pStep: STEP, pClass: string, pCallback: any): any;
     onFieldDefine(pStep: STEP, pClass: string, pCallback: any): any;

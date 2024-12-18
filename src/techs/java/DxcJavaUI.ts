@@ -1,6 +1,5 @@
-import {UiCmpData, DxcUiAPI} from "../../DxcUiAPI";
-import {TECH_TYPE} from "../../DxcAgent";
-
+import {UiCmpData, DxcUiAPI} from "../../DxcUiAPI.js";
+import {TECH_TYPE} from "../../DxcAgent.js";
 
 type ParentHashCode = number;
 type ViewHashCode = number;

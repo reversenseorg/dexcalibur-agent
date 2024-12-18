@@ -1,5 +1,5 @@
-import {BUS_EVENT, DxcAgent, TECH_TYPE} from "./DxcAgent";
-import {UiJavaCmpData} from "./techs/java/DxcJavaUI";
+import {BUS_EVENT, DxcAgent, TECH_TYPE} from "./DxcAgent.js";
+import {UiJavaCmpData} from "./techs/java/DxcJavaUI.js";
 
 
 export type UiCmpData = {header: string[], data:UiJavaCmpData[], type:TECH_TYPE};
