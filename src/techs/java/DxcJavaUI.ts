@@ -117,7 +117,7 @@ export class DxcJavaUI extends DxcUiAPI {
         let extractedView: any[] = [];
         //  extractedView = [parentHashId:number, vHash:number, Cls:string, viewId:number, resName:string, flags: string,
         //  (bounds relative to the parentView), text: string]
-        extractedView.push(pParentHashId) //TODO getId System.hash
+        extractedView.push(pParentHashId)
         pView = Java.cast(pView, Java.use(pView.$className));
         // getId() -> mId, mAutofillViewId, mAccessibilityViewId, (id used in toString method: Integer.toHexString(System.identityHashCode(view)))
         let vHash: number = Java.use('java.lang.System').identityHashCode(pView);
