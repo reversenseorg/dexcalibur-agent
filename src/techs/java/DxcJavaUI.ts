@@ -19,11 +19,15 @@ type Editable = boolean;
 type Password = boolean;
 type Checked = boolean | null;
 type ContentDescription = string;
+type Flags = number[];
 
 // "mPrivateFlags2", "mPrivateFlags3", "mPrivateFlags4" are not used in the UI view representation.
 const FLAGS_TO_RETRIEVE = ["mViewFlags", "mPrivateFlags"] // , "mPrivateFlags2", "mPrivateFlags3", "mPrivateFlags4"]
 const CONTENT_DESCRIPTION_FIELD = "mContentDescription";
-type Flags = [number, number, number, number, number];
+const SCROLL_UP_DIRECTION = -1;
+const SCROLL_DOWN_DIRECTION = 1;
+const SCROLL_LEFT_DIRECTION = -1;
+const SCROLL_RIGHT_DIRECTION = 1;
 
 
 export type UiJavaCmpData = [ParentHashId, HashId, Cls, LocalId, ResourceName, Flags, Bounds,
@@ -33,7 +37,7 @@ export class DxcJavaUI extends DxcUiAPI {
 
     static DEFAULT_ROOT_VIEW_ID = 0;
     static VIEW_LIST_HEADER = ["parentHashId", "hashId", "cls", "localId", "resourceName", "flags", "bounds",
-        "text", "editable", "password", "checked", "contentDescription"];
+        "translationXYZ", "boundsOnScreen", "text", "editable", "password", "checked", "scrollable", "contentDescription"];
     static TEXTVIEW_MAX_LENGTH = 200;
     static CLICKABLE_VIEW = 0x00004000;
     static LONG_CLICKABLE_VIEW = 0x00200000;
@@ -44,14 +48,15 @@ export class DxcJavaUI extends DxcUiAPI {
     clsViewGroup:any;
     clsEditText:any;
     fridaClsViewGroup:any;
-    accessibilityStateChangeListeners = null;
+    mAccessibilityStateChangeListeners = null;
     clsViewRootHandler;
     fViewRootImpl: any;
     fContext: any;
     fRootView: any;
     flagFields: any[];
-    fridaClsCharSequence: Java.Wrapper<{}>;
-    fridaClsSystem: Java.Wrapper<{}>;
+    mGetBoundsOnScreen;
+    bufferRectangle;
+
 
     constructor(pDxcAgent:DxcAgent, pJavaAPI: DxcJava) {
         super(pDxcAgent);
@@ -64,47 +69,54 @@ export class DxcJavaUI extends DxcUiAPI {
      * @method
      */
     initDecorView() {
-        this.view_NO_ID = Java.use("android.view.View").NO_ID;
-        let clsClass = Java.use("java.lang.Class");
+        try {
+            this.view_NO_ID = Java.use("android.view.View").NO_ID;
+            let clsClass = Java.use("java.lang.Class");
 
-        this.clsViewGroup = clsClass.forName("android.view.ViewGroup");
-        this.clsEditText = clsClass.forName("android.widget.EditText");
-        this.fridaClsViewGroup = Java.use('android.view.ViewGroup');
+            this.clsViewGroup = clsClass.forName("android.view.ViewGroup");
+            this.clsEditText = clsClass.forName("android.widget.EditText");
+            this.fridaClsViewGroup = Java.use('android.view.ViewGroup');
 
-        // Setup accessibilityStateChangeListeners
-        let clsAccessibilityManager = clsClass.forName("android.view.accessibility.AccessibilityManager");
-        let fInstance = clsAccessibilityManager.getDeclaredField("sInstance");
-        fInstance.setAccessible(true);
-        let accessibilityManager = fInstance.get(null);
-        let fStateChangeListeners = clsAccessibilityManager.getDeclaredField("mAccessibilityStateChangeListeners");
-        fStateChangeListeners.setAccessible(true);
-        this.accessibilityStateChangeListeners = fStateChangeListeners.get(accessibilityManager);
-        // ArrayMap<AccessibilityStateChangeListener, Handler>
-        this.accessibilityStateChangeListeners = Java.cast(this.accessibilityStateChangeListeners,
-                                                            Java.use("android.util.ArrayMap"));
+            // Setup mAccessibilityStateChangeListeners
+            let clsAccessibilityManager = clsClass.forName("android.view.accessibility.AccessibilityManager");
+            let fInstance = clsAccessibilityManager.getDeclaredField("sInstance");
+            fInstance.setAccessible(true);
+            let accessibilityManager = fInstance.get(null);
+            let fStateChangeListeners = clsAccessibilityManager.getDeclaredField("mAccessibilityStateChangeListeners");
+            fStateChangeListeners.setAccessible(true);
+            this.mAccessibilityStateChangeListeners = fStateChangeListeners.get(accessibilityManager);
+            // ArrayMap<AccessibilityStateChangeListener, Handler>
+            this.mAccessibilityStateChangeListeners = Java.cast(this.mAccessibilityStateChangeListeners,
+                Java.use("android.util.ArrayMap"));
 
-        // Setup fViewRootImpl
-        this.fViewRootImpl = clsClass.forName("android.view.ViewRootImpl$ViewRootHandler").getDeclaredField("this$0");
-        this.fViewRootImpl.setAccessible(true);
-        // Setup fRootView and fContext
-        let clsViewRootImpl = clsClass.forName("android.view.ViewRootImpl");
-        this.fRootView = clsViewRootImpl.getDeclaredField("mView");
-        this.fRootView.setAccessible(true);
-        this.fContext = clsViewRootImpl.getDeclaredField("mContext");
-        this.fContext.setAccessible(true);
-        this.clsViewRootHandler = clsClass.forName("android.view.ViewRootImpl$ViewRootHandler");
+            // Setup fViewRootImpl
+            this.fViewRootImpl = clsClass.forName("android.view.ViewRootImpl$ViewRootHandler").getDeclaredField("this$0");
+            this.fViewRootImpl.setAccessible(true);
+            // Setup fRootView and fContext
+            let clsViewRootImpl = clsClass.forName("android.view.ViewRootImpl");
+            this.fRootView = clsViewRootImpl.getDeclaredField("mView");
+            this.fRootView.setAccessible(true);
+            this.fContext = clsViewRootImpl.getDeclaredField("mContext");
+            this.fContext.setAccessible(true);
+            this.clsViewRootHandler = clsClass.forName("android.view.ViewRootImpl$ViewRootHandler");
 
-        this.flagFields = [];
-        for (let flag_name of FLAGS_TO_RETRIEVE) {
-            let field = Java.use('android.view.View').class.getDeclaredField(flag_name);
-            if (field != null) {
-                // Get around @UnsupportedAppUsage by setting the field as accessible.
-                field.setAccessible(true);
+            this.flagFields = [];
+            for (let flag_name of FLAGS_TO_RETRIEVE) {
+                let field = Java.use('android.view.View').class.getDeclaredField(flag_name);
+                if (field != null) {
+                    // Get around @UnsupportedAppUsage by setting the field as accessible.
+                    field.setAccessible(true);
+                }
+                this.flagFields.push(field);
             }
-            this.flagFields.push(field);
-        }
-        this.fridaClsCharSequence = Java.use("java.lang.CharSequence");
-        this.fridaClsSystem = Java.use("java.lang.System");
+            let clsView = clsClass
+                .forName("android.view.View");
+            this.mGetBoundsOnScreen = clsView.getDeclaredMethod("getBoundsOnScreen", [this._javaAPI.class.android.graphics.Rect.class]);
+            this.mGetBoundsOnScreen.setAccessible(true);
+            this.bufferRectangle = this._javaAPI.class.android.graphics.Rect.$new();
+        } catch (e) {
+                console.error("[DxcJavaUI][INIT]", e.stack);
+            }
     }
 
     /**
@@ -116,12 +128,12 @@ export class DxcJavaUI extends DxcUiAPI {
      */
     dumpView(): UiCmpData {
         let view_list: UiJavaCmpData[][] = [];
-        if (this.accessibilityStateChangeListeners == null) {
+        if (this.mAccessibilityStateChangeListeners == null) {
             this.initDecorView();
         }
-        for (let i = 0; i < this.accessibilityStateChangeListeners.size(); i++) {
+        for (let i = 0; i < this.mAccessibilityStateChangeListeners.size(); i++) {
         // Improvement: detect if the rootView is focused.
-            let handler = this.accessibilityStateChangeListeners.valueAt(i);
+            let handler = this.mAccessibilityStateChangeListeners.valueAt(i);
             if (this.clsViewRootHandler.isInstance(handler)) {
                 let viewRootImpl = this.fViewRootImpl.get(handler);
                 let ctxWrapper = this.fContext.get(viewRootImpl);
@@ -129,12 +141,9 @@ export class DxcJavaUI extends DxcUiAPI {
                 let res = ctxWrapper.getResources();
                 let rootView = this.fRootView.get(viewRootImpl);
                 rootView = Java.cast(rootView, Java.use(rootView.$className));
-                let ui = this.extract_view_list(rootView, DxcJavaUI.DEFAULT_ROOT_VIEW_ID, res);
-                view_list.push(ui);
+                view_list.push(this.extract_view_list(rootView, DxcJavaUI.DEFAULT_ROOT_VIEW_ID, res));
             } else {
-                console.log("Handler not a ViewRootHandler");
-                console.log(handler);
-                console.log(handler.$className);
+                console.error("[DXCJavaUI][DumpView] Handler not a ViewRootHandler ", handler.$className);
             }
         }
         let ret: UiJavaCmpData[][] = view_list as UiJavaCmpData[][];
@@ -173,7 +182,7 @@ export class DxcJavaUI extends DxcUiAPI {
         extractedView.push(viewId);
         // 5. Get the view Resource ID from the view ID.
         try {
-            if (viewId != this.view_NO_ID && pRes != null) {
+            if (viewId != null && viewId != this.view_NO_ID && pRes != null) {
                 extractedView.push(pRes.getResourceName(viewId));
             } else {
                 extractedView.push("");
@@ -194,25 +203,45 @@ export class DxcJavaUI extends DxcUiAPI {
         extractedView.push(vFlags);
         // 7, Get the view Bounds
         extractedView.push([pView.getLeft(), pView.getTop(), pView.getRight(), pView.getBottom()]);
+        // Optional bonus Bounds
+        extractedView.push([pView.getTranslationX(), pView.getTranslationY(), pView.getTranslationZ()]);
+        this.bufferRectangle.setEmpty();
+        this.mGetBoundsOnScreen.invoke(pView, [this.bufferRectangle]);
+        extractedView.push([this.bufferRectangle.left.value, this.bufferRectangle.top.value,
+            this.bufferRectangle.right.value, this.bufferRectangle.bottom.value]);
         // TODO: Improvement orgClickListener.getClass().getName()); For AdapterView ViewGroup, the onclick also goes for children views.
         // 8-9-10. Get the view text - Get Editable status - Get isPassword
         if (typeof pView.getText === 'function') { // Alternative: check if view is instance of TextView
             let viewText = pView.getText();
             if (viewText != null) {
-                // Need to cast the viewText to its own class, to be sure to be able to call length() and toString().
-                viewText = Java.cast(viewText, this.fridaClsCharSequence);
-                // Truncate the text.
-                if (typeof viewText.length === 'function' && viewText.length() > DxcJavaUI.TEXTVIEW_MAX_LENGTH) {
-                    viewText = viewText.subSequence(0, DxcJavaUI.TEXTVIEW_MAX_LENGTH);
-                }
-                extractedView.push(viewText.toString());
-                // 9 Get Editable view status
-                extractedView.push(this.clsEditText.isInstance(pView));
-                // 10 Get isPassword view status
-                if (typeof pView.isAnyPasswordInputType === 'function') { // Method from TextView
-                    let isPassword: boolean = pView.isAnyPasswordInputType()
-                    extractedView.push(isPassword);
-                } else {
+                try {
+                    // Need to cast the viewText to its own class, to be sure to be able to call length() and toString().
+                    viewText = Java.cast(viewText, this._javaAPI.class.java.lang.CharSequence);
+                    // Truncate the text.
+                    if (typeof viewText.length === 'function' && viewText.length() > DxcJavaUI.TEXTVIEW_MAX_LENGTH) {
+                        viewText = viewText.subSequence(0, DxcJavaUI.TEXTVIEW_MAX_LENGTH);
+                    }
+                    extractedView.push(viewText.toString());
+                    // 9 Get Editable view status
+                    extractedView.push(this.clsEditText.isInstance(pView));
+                    // 10 Get isPassword view status
+                    if (typeof pView.isAnyPasswordInputType === 'function') { // Method from TextView
+                        let isPassword: boolean = pView.isAnyPasswordInputType()
+                        extractedView.push(isPassword);
+                    } else {
+                        extractedView.push(null);
+                    }
+                } catch (e) {
+                    console.error("[DxcAgent][JavaUI] Cast pView.getText: ",e);
+                    //console.log(viewText.$className);
+                    viewText = Java.cast(viewText, viewText.$className);
+                    if (typeof viewText.toString === 'function') {
+                        console.log(viewText.toString());
+                        extractedView.push(viewText.toString());
+                    } else {
+                        extractedView.push(null);
+                    }
+                    extractedView.push(null);
                     extractedView.push(null);
                 }
             }
@@ -231,6 +260,13 @@ export class DxcJavaUI extends DxcUiAPI {
             // View is not Checkable
             extractedView.push(null);
         }
+        const scrollable = [
+            pView.canScrollVertically(SCROLL_UP_DIRECTION),
+            pView.canScrollVertically(SCROLL_DOWN_DIRECTION),
+            pView.canScrollHorizontally(SCROLL_LEFT_DIRECTION),
+            pView.canScrollHorizontally(SCROLL_RIGHT_DIRECTION),
+        ];
+        extractedView.push(scrollable);
         // 11. Get the view Content Description
         extractedView.push(pView.getContentDescription());
         /* Added by Toller

@@ -1,8 +1,14 @@
 export class DxcJava {
 
     class:any = {
+        android: {
+            graphics: {
+                Rect: Java.use("android.graphics.Rect"),
+            }
+        },
         java: {
             lang:{
+                CharSequence: Java.use("java.lang.CharSequence"),
                 Class: Java.use("java.lang.Class"),
                 System: Java.use('java.lang.System'),
                 String: Java.use('java.lang.String'),
