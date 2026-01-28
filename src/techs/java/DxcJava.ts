@@ -1,3 +1,4 @@
+import Java from "frida-java-bridge"
 export class DxcJava {
 
     class:any = {

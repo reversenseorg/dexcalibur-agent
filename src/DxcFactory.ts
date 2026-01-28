@@ -1,3 +1,4 @@
+import Java from "frida-java-bridge"
 import {DxcAgent} from "./DxcAgent.js";
 
 

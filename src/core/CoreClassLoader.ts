@@ -1,4 +1,4 @@
-
+import Java from "frida-java-bridge"
 
 export class CoreClassLoader {
 
@@ -11,13 +11,16 @@ export class CoreClassLoader {
     }
 
     refresh(){
-        Java.enumerateClassLoadersSync().map( (x)=>{
-            const fqcn = x.getClass().getCanonicalName();
-            console.log('ClassLoader: '+fqcn);
-            if(this.cl[fqcn]!=null){
-                this.cl[fqcn] = x;
-            }
-        });
+        if(typeof Java !== "undefined"){
+            Java.enumerateClassLoadersSync().map( (x)=>{
+                const fqcn = x.getClass().getCanonicalName();
+                console.log('ClassLoader: '+fqcn);
+                if(this.cl[fqcn]!=null){
+                    this.cl[fqcn] = x;
+                }
+            });
+        }
+
     }
 
     get path():any{

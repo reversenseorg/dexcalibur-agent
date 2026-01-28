@@ -12,4 +12,8 @@ pack: compile
 	npx webpack --config webpack.android.arm64.config.js
 	npx webpack --config webpack.android.x64.config.js
 
+link:
+	rm -rf ${HOME}/WebstormProjects/dexcalibur-ts/dist/agent
+	cp -r ${PWD}/dist ${HOME}/WebstormProjects/dexcalibur-ts/dist/agent
+
 all: pack

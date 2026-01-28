@@ -1,3 +1,4 @@
+import Java from "frida-java-bridge"
 // Source Toller: https://github.com/TOLLER-Android/main/blob/main/on-device-agent/java/edu/illinois/cs/ase/ViewHandlerAnalysis.java
 
 import {UiCmpData, DxcUiAPI} from "../../DxcUiAPI.js";

@@ -1,6 +1,14 @@
+import Java from "frida-java-bridge"
+
 export class DxcUtils {
 
-    private  _class = Java.use("java.lang.Class");
+    private  _class=null;
+
+    constructor(){
+        if(typeof Java !== "undefined"){
+            this._class = Java.use("java.lang.Class");
+        }
+    }
 
     c2s(pCharArr:any[]){
         const char:any[] = Java.array("char",pCharArr);

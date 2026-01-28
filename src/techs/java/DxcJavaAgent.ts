@@ -1,3 +1,4 @@
+import Java from "frida-java-bridge"
 import {STEP} from "../../core/const.js";
 import {IOopAgent} from "../../core/IOopAgent.js";
 import {DxcAgent} from "../../DxcAgent.js";
