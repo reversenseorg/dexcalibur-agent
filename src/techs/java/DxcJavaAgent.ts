@@ -29,7 +29,7 @@ export class DxcJavaAgent implements IOopAgent {
     constructor(pParent:DxcAgent) {
         this._parent = pParent;
         this._javaAPI = new DxcJava();
-        this._javaUI_API = new DxcJavaUI(pParent);
+        this._javaUI_API = new DxcJavaUI(this._parent, this._javaAPI);
         this.class = this._javaAPI.class;
     }
 
