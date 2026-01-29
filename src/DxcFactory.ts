@@ -66,6 +66,8 @@ export class DxcFactory {
      * To load everything
      */
     load(){
+        return;
+
         if(this.dl_open.length > 0) this._hookDlOpen();
         if(this.defines.classes.length > 0) this._hookClassDefine();
         //if(this.defines.method.length > 0) this._hookMethodDefine();

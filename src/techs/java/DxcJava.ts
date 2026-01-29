@@ -49,12 +49,11 @@ export class DxcJava {
     obj:any = {}
 
     constructor() {
-        this.obj.thread = this.class.java.lang.Thread.$new();
     }
 
 
     printStackTrace() {
-        const stack = this.obj.thread.currentThread().getStackTrace();
+        const stack = Java.use("java.lang.Exception").$new().getStackTrace()
         let msg = "";
         // the two firsts stack trace elements are skipped
         for (let i = 2; i < stack.length; i++) {
@@ -91,7 +90,7 @@ export class DxcJava {
     }
 
     getStackTrace() {
-        const stack = this.obj.thread.currentThread().getStackTrace();
+        const stack = Java.use("java.lang.Exception").$new().getStackTrace()
         const msg = [];
         // the two firsts stack trace elements are skipped
         for (let i = 2; i < stack.length; i++) {
