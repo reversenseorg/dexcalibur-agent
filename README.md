@@ -14,13 +14,16 @@ HTTPS clone URL: https://git.jetbrains.space/reversense/dxc/dexcalibur-agent.git
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
-## Prerequisites
+## Development setup
 
-What things you need to install the software and how to install them.
+You must configure a global environment variable `DXC_DEV_WS` pointing to the development workspace directory, in your bashrc file.
 
+With something like:
 ```
-Examples
+export DXC_DEV_WS=$HOME/dxc
 ```
+
+Then makefile and others script will use this variable.
 
 ## Deployment
 
