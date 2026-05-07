@@ -6,6 +6,7 @@ import {SyscallCondition} from "./core/SyscallCondition.js";
 import {ADAPTER, IAdapterAgent} from "./core/const.js";
 import {DxcJavaAgent} from "./techs/java/DxcJavaAgent.js";
 import {DxcObjcAgent} from "./techs/objc/DxcObjcAgent.js";
+import {DxcKeyPointHandler} from "./core/DxcKeyPointHandler";
 
 export interface SystemCallHookOptions {
     file?:RegExp|string;
@@ -47,6 +48,7 @@ export class DxcAgent {
     classLoader:any = {};
     modifier:any = {};
     mods:any = {};
+    kp:DxcKeyPointHandler;
 
 
     NODE:any = NodeInternalType;
@@ -61,6 +63,7 @@ export class DxcAgent {
     constructor( pTracerFactory:any) {
         this.tracerFactory = pTracerFactory;
         this.classLoader = new CoreClassLoader();
+        this.kp = new DxcKeyPointHandler(this);
         this._factory = new DxcFactory(this);
     }
 
@@ -248,5 +251,19 @@ export class DxcAgent {
                 session:null
             }
         })
+    }
+
+    httpReq(pHookId:string, pFragmentId:string, pVerb:string, pUrl:string, pHeader:any[] = [], pBody:any = null){
+        send({
+            hid: pHookId,
+            fid: pFragmentId,
+            type: "http_req",
+            data: {
+                verb: pVerb,
+                url: pUrl,
+                header: pHeader,
+                body: pBody
+            }
+        });
     }
 }

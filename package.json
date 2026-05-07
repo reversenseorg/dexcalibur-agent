@@ -1,6 +1,6 @@
 {
   "name": "@dexcalibur/dexcalibur-agent",
-  "version": "1.2.0",
+  "version": "1.3.1",
   "description": "The dexcalibur agent-side lib",
   "main": "index.ts",
   "scripts": {
