@@ -6,7 +6,7 @@ import {SyscallCondition} from "./core/SyscallCondition.js";
 import {ADAPTER, IAdapterAgent} from "./core/const.js";
 import {DxcJavaAgent} from "./techs/java/DxcJavaAgent.js";
 import {DxcObjcAgent} from "./techs/objc/DxcObjcAgent.js";
-import {DxcKeyPointHandler} from "./core/DxcKeyPointHandler";
+import {DxcKeyPointHandler} from "./core/DxcKeyPointHandler.js";
 
 export interface SystemCallHookOptions {
     file?:RegExp|string;

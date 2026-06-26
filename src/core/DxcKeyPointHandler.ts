@@ -1,4 +1,3 @@
-import {DxcAgent} from "../DxcAgent";
 
 export type KpHandler = ((vArgs:any,vCtx:KpCtx)=>void);
 
@@ -26,9 +25,9 @@ export class DxcKeyPointHandler {
 
     lookup:Record<string, Record<any, any>> = {};
 
-    a:DxcAgent;
+    a:any;
 
-    constructor(pCtx:DxcAgent){
+    constructor(pCtx:any){
         this.a = pCtx;
     }
 
