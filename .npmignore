@@ -2,5 +2,13 @@
 ./examples/**
 ./lib/**
 ./old_dist/**
+./scripts/**
+./test/**
+./dist_backup/**
+./.git/**
+.gitignore
+.nvmrc
+.projid
 .npmrc
 .DS_Store
+.tsconfig.json

@@ -45,10 +45,9 @@ export class DxcJava {
             }
         };
         this.obj = {};
-        this.obj.thread = this.class.java.lang.Thread.$new();
     }
     printStackTrace() {
-        const stack = this.obj.thread.currentThread().getStackTrace();
+        const stack = Java.use("java.lang.Exception").$new().getStackTrace()
         let msg = "";
         for (let i = 2; i < stack.length; i++) {
             msg = msg + i + " => " + stack[i].toString() + "<br>&nbsp;&nbsp;";
@@ -73,7 +72,8 @@ export class DxcJava {
         return content;
     }
     getStackTrace() {
-        const stack = this.obj.thread.currentThread().getStackTrace();
+        //const stack = this.obj.thread.currentThread().getStackTrace();
+        const stack = Java.use("java.lang.Exception").$new().getStackTrace()
         const msg = [];
         for (let i = 2; i < stack.length; i++) {
             msg.push({
