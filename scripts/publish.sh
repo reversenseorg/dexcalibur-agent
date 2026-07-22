@@ -22,7 +22,7 @@
 set -e
 
 # Publish npm package within @dexcalibur scope
-npm publish   # use @dexcalibur/<pkg> by default
+# npm publish   # use @dexcalibur/<pkg> by default
 
 # Switch scope to ublish npm package within @reversenseorg scope
 cp package.json package.json.bak
