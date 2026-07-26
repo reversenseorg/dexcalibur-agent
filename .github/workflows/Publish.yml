@@ -53,6 +53,8 @@ jobs:
           npm run pack-arm64
           chmod +x ./scripts/gh_publish.sh
       - name: Publish to NPM github registry
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           ./scripts/gh_publish.sh
 
