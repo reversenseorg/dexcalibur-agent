@@ -3,7 +3,7 @@ name: Publish
 
 on:
   release:
-    types: ['published','released','preleased']
+    type: ['released','prereleased','published']
   workflow_dispatch:
     inputs:
       tag_name:
@@ -14,9 +14,12 @@ on:
         description: 'Skip upload'
         required: false
         type: boolean
-
 env:
   TAG: ${{ inputs.tag || github.event.release.tag_name }}
+
+permissions:
+  id-token: write  # Required for OIDC
+  contents: write   # Required to upload assets
 
 jobs:
   detect-node-version:
@@ -26,71 +29,43 @@ jobs:
       node_version: ${{ steps.nvmrc.outputs.version }}
     steps:
       - uses: actions/checkout@v4
-
       - id: nvmrc
         run: echo "version=$(cat .nvmrc | cut -b2-)" >> "$GITHUB_OUTPUT"
 
-  build:
-    name: Build dxc-pro
+  publish:
+    name: Build and publish agent lib
     needs: detect-node-version
     runs-on: ubuntu-latest
-    container:
-      image: node:${{ needs.detect-node-version.outputs.node_version }}-slim
     steps:
-      - name: Install git (checkout prerequisite)
-        run: |
-          apt-get update
-          apt-get install -y --no-install-recommends curl git ca-certificates
-          rm -rf /var/lib/apt/lists/*
-
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ needs.detect-node-version.outputs.node_version }}
+          registry-url: 'https://registry.npmjs.org'
+          package-manager-cache: false  # never use caching in release builds
       - name: Install global deps
         run: npm install -g webpack webpack-cli
       - name: Install dependencies
         run: npm install
-
       - name: Dump npm debug log
         if: failure()
         run: |
           grep -iE 'http fetch .*(401|GET)' /github/home/.npm/_logs/*-debug-0.log | tail -40
           npm config ls -l | grep -iE 'registry|authToken|_auth|always-auth'
-
       - name: Build code
         run: |
           npm run build
           npm run pack-generic
           npm run pack-x64
           npm run pack-arm64
-          chmod +x ./scripts/publish.sh 
-
-      - name: Publish to NPM registries
-        env:
-          NPMJS_TOKEN: ${{ secrets.NPMJS_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          chmod +x ./scripts/gh_publish.sh
+      - name: Publish to NPM github registry
         run: |
-          ./scripts/publish.sh
-
-  release-upload:
-    needs: build
-    if: ${{ !inputs.skip_upload }}
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: dexcalibur-agent
-
-      - name: Upload release asset
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_REPO:  ${{ github.repository }}
-          RELEASE_ID: ${{ github.event.release.id }}
-        run: gh release upload "$TAG" dexcalibur-agent-$TAG.tar.gz --clobber
+          ./scripts/gh_publish.sh
 
   notify-discord:
     name: Discord notification
-    needs: release-upload
+    needs: [publish]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -114,7 +89,7 @@ jobs:
           RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
           
           jq -n \
-            --arg title   "${GITHUB_WORKFLOW} — ${STATUS}" \
+            --arg title   "Agent:build - ${GITHUB_WORKFLOW} — ${STATUS}" \
             --arg url     "$RUN_URL" \
             --arg branch  "$GITHUB_REF_NAME" \
             --arg sha     "${GITHUB_SHA:0:8}" \
@@ -129,9 +104,9 @@ jobs:
                 color: $color,
                 description: $msg,
                 fields: [
-                  {name: "Branche", value: $branch, inline: true},
+                  {name: "Branch", value: $branch, inline: true},
                   {name: "Commit",  value: $sha,    inline: true},
-                  {name: "Auteur",  value: $actor,  inline: true}
+                  {name: "Author",  value: $actor,  inline: true}
                 ],
                 timestamp: (now | todate)
               }],
