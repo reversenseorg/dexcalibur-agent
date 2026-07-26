@@ -12,10 +12,7 @@
     "cleanup": "rm -r ./dist"
   },
   "files": [
-    "src/**/*.d.ts",
-    "src/**/*.js",
-    "*.d.ts",
-    "*.js"
+    "dist/**/*.d.ts"
   ],
   "repository": {
     "type": "git",

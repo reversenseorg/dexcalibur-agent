@@ -53,10 +53,13 @@ jobs:
           npm run pack-arm64
       - name: Pack both names
         run: |
+          set -euo pipefail
+          mkdir -p out
           npm pkg set name="@reversense/dexcalibur-agent"
           npm pack --pack-destination out/
           npm pkg set name="@reversenseorg/dexcalibur-agent"
           npm pack --pack-destination out/
+          ls -la out/
       - uses: actions/upload-artifact@v4
         with: { name: tarballs, path: out/*.tgz }
 
