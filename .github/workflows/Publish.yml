@@ -75,6 +75,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with: { name: tarballs, path: out/ }
       - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
         with: { node-version-file: '.nvmrc' }
       - run: |
           rm -f ~/.npmrc
