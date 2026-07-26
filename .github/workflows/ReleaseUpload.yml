@@ -1,0 +1,76 @@
+# Equivalent to GitHub Actions de Dexcalibur_BuildDxcPro_Web (TeamCity Kotlin DSL)
+name: ReleaseUpload
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Release tag to build'
+        required: true
+        type: string
+env:
+  TAG: ${{ inputs.tag }}
+
+permissions:
+  contents: write   # Required to upload assets
+
+jobs:
+  detect-node-version:
+    name: Detect node version
+    runs-on: ubuntu-latest
+    outputs:
+      node_version: ${{ steps.nvmrc.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: nvmrc
+        run: echo "version=$(cat .nvmrc | cut -b2-)" >> "$GITHUB_OUTPUT"
+
+  build:
+    name: Build agent lib
+    needs: detect-node-version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ needs.detect-node-version.outputs.node_version }}
+          registry-url: 'https://registry.npmjs.org'
+          package-manager-cache: false  # never use caching in release builds
+      - name: Install global deps
+        run: npm install -g webpack webpack-cli
+      - name: Install dependencies
+        run: npm install
+      - name: Dump npm debug log
+        if: failure()
+        run: |
+          grep -iE 'http fetch .*(401|GET)' /github/home/.npm/_logs/*-debug-0.log | tail -40
+          npm config ls -l | grep -iE 'registry|authToken|_auth|always-auth'
+      - name: Build code
+        run: |
+          npm run build
+          npm run pack-generic
+          npm run pack-x64
+          npm run pack-arm64
+
+  release-upload:
+    needs: build
+    if: success()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Package artifacts
+        run: |
+          cd ./dist
+          tar -czvf ../dexcalibur-agent-$TAG.tar.gz ./*
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: dexcalibur-agent
+
+      - name: Upload release asset
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO:  ${{ github.repository }}
+          RELEASE_ID: ${{ github.event.release.id }}
+        run: gh release upload "$TAG" dexcalibur-agent-$TAG.tar.gz --clobber
