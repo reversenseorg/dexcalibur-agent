@@ -25,12 +25,14 @@ jobs:
   build:
     name: Build agent libs
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v6
         with: { persist-credentials: false }
       - uses: actions/setup-node@v6
         with:
-          node-version-file: '../.nvmrc'
+          node-version-file: '.nvmrc'
           registry-url: 'https://registry.npmjs.org'
           scope: '@reversense'
           package-manager-cache: false  # never use caching in release builds
@@ -49,70 +51,55 @@ jobs:
           npm run pack-generic
           npm run pack-x64
           npm run pack-arm64
+      - name: Pack both names
+        run: |
+          npm pkg set name="@reversense/dexcalibur-agent"
+          npm pack --pack-destination out/
+          npm pkg set name="@reversenseorg/dexcalibur-agent"
+          npm pack --pack-destination out/
+      - uses: actions/upload-artifact@v4
+        with: { name: tarballs, path: out/*.tgz }
 
-  github-publish:
+  publish:
     name: Publish as GitHub NPM package
     runs-on: ubuntu-latest
     needs: build
-    if: success()
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - uses: actions/setup-node@v6
-        with:
-          node-version-file: '../.nvmrc'
-          registry-url: 'https://npm.pkg.github.com/'
-          scope: '@reversenseorg'
-          package-manager-cache: false  # never use caching in release builds
-      - name: Publish to registry
-        run: |
-          npm pkg set name="@reversenseorg/dexcalibur-agent"
-          npm publish --registry=https://npm.pkg.github.com/
-  npmjs-publish:
-    name: Publish as NPMjs package
-    runs-on: ubuntu-latest
-    needs: build
-    if: success()
     permissions:
       contents: read
       packages: write
       id-token: write
     steps:
-      - uses: actions/setup-node@v6
-        with:
-          node-version-file: '../.nvmrc'
-          registry-url: 'https:/registry.npmjs.org/'
-          scope: '@reversense'
-          package-manager-cache: false  # never use caching in release builds
-      - name: OIDC preflight
+      - uses: actions/download-artifact@v4
+        with: { name: tarballs, path: out/ }
+      - uses: actions/checkout@v6
+        with: { node-version-file: '.nvmrc' }
+      - run: npm publish out/reversense-dexcalibur-agent-*.tgz --access public
+      - env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "npm            : $(npm --version)"
-          echo "ID_TOKEN_URL   : ${ACTIONS_ID_TOKEN_REQUEST_URL:-ABSENT}"
-          echo "npmjs authToken: $(npm config get //registry.npmjs.org/:_authToken)"
-          echo "userconfig     : ${NPM_CONFIG_USERCONFIG:-$HOME/.npmrc}"
-      - name: Publish to NPM github registry
-        run: |
-          npm pkg set name="@reversense/dexcalibur-agent"
-          npm publish --registry=https://registry.npmjs.org/
+          echo '//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}' >> ~/.npmrc
+          npm publish out/reversenseorg-dexcalibur-agent-*.tgz \
+            --registry=https://npm.pkg.github.com/
+
 
   notify-discord:
     name: Discord notification
-    needs: [npmjs-publish,github-publish]
+    needs: [build,publish]
     if: always()
     runs-on: ubuntu-latest
     steps:
       - name: Post to Discord
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          BUILD_RESULT: ${{ needs.build.result }}
           PUBLISH_RESULT: ${{ needs.publish.result }}
           COMMIT_MSG: ${{ github.event.head_commit.message }}
         run: |
           set -euo pipefail
           
-          if [[ "PUBLISH_RESULT" == "success" && "$RELEASE_RESULT" == "success" ]]; then
+          if [[ "PUBLISH_RESULT" == "success" && "BUILD_RESULT" == "success" ]]; then
             STATUS="SUCCESS"; COLOR=$(( 16#2EA043 ))
-          elif [[ "$BUILD_RESULT" == "cancelled" || "$RELEASE_RESULT" == "cancelled" ]]; then
+          elif [[ "$BUILD_RESULT" == "cancelled" || "PUBLISH_RESULT" == "cancelled" ]]; then
             STATUS="CANCELLED"; COLOR=$(( 16#6E7681 ))
           else
             STATUS="FAILED"; COLOR=$(( 16#D73A49 ))
