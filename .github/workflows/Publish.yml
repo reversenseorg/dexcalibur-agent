@@ -76,13 +76,15 @@ jobs:
         with: { name: tarballs, path: out/ }
       - uses: actions/checkout@v6
         with: { node-version-file: '.nvmrc' }
-      - run: npm publish out/reversense-dexcalibur-agent-*.tgz --access public
+      - run: |
+          rm -f ~/.npmrc
+          npm publish out/reversense-dexcalibur-agent-*.tgz --registry=https://registry.npmjs.org/ --access public
       - env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo '//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}' >> ~/.npmrc
-          npm publish out/reversenseorg-dexcalibur-agent-*.tgz \
-            --registry=https://npm.pkg.github.com/
+          rm -f ~/.npmrc
+          echo '//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}' > ~/.npmrc
+          npm publish out/reversenseorg-dexcalibur-agent-*.tgz --registry=https://npm.pkg.github.com/ --access public
 
 
   notify-discord:
