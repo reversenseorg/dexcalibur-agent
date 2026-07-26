@@ -20,12 +20,14 @@ env:
 permissions:
   id-token: write  # Required for OIDC
   contents: write   # Required to upload assets
-  packages: write
 
 jobs:
   publish:
     name: Build and publish agent lib
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v6
         with: { persist-credentials: false }
