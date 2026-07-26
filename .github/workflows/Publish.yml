@@ -36,7 +36,7 @@ jobs:
         with:
           node-version-file: '.nvmrc'
           registry-url: 'https://registry.npmjs.org'
-          scope: '@reversenseorg'
+          scope: '@reversense'
           package-manager-cache: false  # never use caching in release builds
       - name: Install global deps
         run: npm install -g webpack webpack-cli
@@ -53,12 +53,16 @@ jobs:
           npm run pack-generic
           npm run pack-x64
           npm run pack-arm64
-          chmod +x ./scripts/gh_publish.sh
-      - name: Publish to NPM github registry
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to NPMJS registry
         run: |
-          ./scripts/gh_publish.sh
+          npm pkg set name="@reversense/dexcalibur-agent"
+          npm publish --registry=https://registry.npmjs.org/
+
+      - name: Publish to NPM github registry
+        run: |
+          npm pkg set name="@reversenseorg/dexcalibur-agent"
+          npm publish --registry=https://npm.pkg.github.com/
 
   notify-discord:
     name: Discord notification
