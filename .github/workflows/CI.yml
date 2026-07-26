@@ -58,14 +58,13 @@ jobs:
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           BUILD_RESULT: ${{ needs.build.result }}
-          RELEASE_RESULT: ${{ needs.release-upload.result }}
           COMMIT_MSG: ${{ github.event.head_commit.message }}
         run: |
           set -euo pipefail
           
-          if [[ "$BUILD_RESULT" == "success" && "$RELEASE_RESULT" == "success" ]]; then
+          if [[ "$BUILD_RESULT" == "success"  ]]; then
             STATUS="SUCCESS"; COLOR=$(( 16#2EA043 ))
-          elif [[ "$BUILD_RESULT" == "cancelled" || "$RELEASE_RESULT" == "cancelled" ]]; then
+          elif [[ "$BUILD_RESULT" == "cancelled" ]]; then
             STATUS="CANCELLED"; COLOR=$(( 16#6E7681 ))
           else
             STATUS="FAILED"; COLOR=$(( 16#D73A49 ))
