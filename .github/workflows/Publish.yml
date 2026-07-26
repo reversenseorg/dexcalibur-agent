@@ -3,7 +3,7 @@ name: Publish
 
 on:
   release:
-    type: ['released','prereleased','published']
+    type: ['released']
   workflow_dispatch:
     inputs:
       tag_name:
@@ -20,28 +20,21 @@ env:
 permissions:
   id-token: write  # Required for OIDC
   contents: write   # Required to upload assets
+  packages: write
 
 jobs:
-  detect-node-version:
-    name: Detect node version
-    runs-on: ubuntu-latest
-    outputs:
-      node_version: ${{ steps.nvmrc.outputs.version }}
-    steps:
-      - uses: actions/checkout@v4
-      - id: nvmrc
-        run: echo "version=$(cat .nvmrc | cut -b2-)" >> "$GITHUB_OUTPUT"
-
   publish:
     name: Build and publish agent lib
-    needs: detect-node-version
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+        with: { persist-credentials: false }
+
       - uses: actions/setup-node@v6
         with:
-          node-version: ${{ needs.detect-node-version.outputs.node_version }}
+          node-version-file: '.nvmrc'
           registry-url: 'https://registry.npmjs.org'
+          scope: '@reversenseorg'
           package-manager-cache: false  # never use caching in release builds
       - name: Install global deps
         run: npm install -g webpack webpack-cli
@@ -62,24 +55,6 @@ jobs:
       - name: Publish to NPM github registry
         run: |
           ./scripts/gh_publish.sh
-
-  release-upload:
-    needs: publish
-    if: ${{ !inputs.skip_upload && success() }}
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: dexcalibur-agent
-
-      - name: Upload release asset
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_REPO:  ${{ github.repository }}
-          RELEASE_ID: ${{ github.event.release.id }}
-        run: gh release upload "$TAG" dexcalibur-agent-$TAG.tar.gz --clobber
 
   notify-discord:
     name: Discord notification
