@@ -81,6 +81,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ needs.build.outputs.node_version }}
+      - name: npm >= 11.5.1
+        run: |
+          npm install -g npm@11.5.1
+          npm --version
       - name: OIDC preflight
         run: |
           npm --version
