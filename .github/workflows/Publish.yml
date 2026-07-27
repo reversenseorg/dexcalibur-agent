@@ -80,7 +80,7 @@ jobs:
         with: { name: tarballs, path: out/ }
       - uses: actions/setup-node@v4
         with:
-          node-version: ${{ needs.detect-node-version.outputs.node_version }}
+          node-version: ${{ needs.build.outputs.node_version }}
       - run: |
           rm -f ~/.npmrc
           npm publish out/reversense-dexcalibur-agent-*.tgz --registry=https://registry.npmjs.org/ --access public
