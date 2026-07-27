@@ -95,9 +95,6 @@ jobs:
         env:
           TAG: ${{ inputs.tag_name || github.event.release.tag_name }}
         run: |
-          echo "USERCONFIG=${NPM_CONFIG_USERCONFIG:-$HOME/.npmrc}"
-          npm config get //registry.npmjs.org/:_authToken
-          sed -i '/_authToken/d' "${NPM_CONFIG_USERCONFIG:-$HOME/.npmrc}" 2>/dev/null || true
           npm publish ./out/reversense-dexcalibur-agent-${TAG#v}.tgz --registry=https://registry.npmjs.org/ \
             --access public \
             --loglevel=verbose 2>&1
