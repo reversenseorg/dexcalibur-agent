@@ -81,7 +81,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ needs.build.outputs.node_version }}
-      - id: npmjs-publis
+      - name: OIDC preflight
+        run: |
+          npm --version
+          echo "ID_TOKEN_URL = ${ACTIONS_ID_TOKEN_REQUEST_URL:-ABSENT}"
+          echo "WORKFLOW_REF = ${GITHUB_WORKFLOW_REF}"
+      - id: npmjs-publish
+        name: Publish to npmjs.org
         env:
           TAG: ${{ inputs.tag_name || github.event.release.tag_name }}
         run: |
@@ -89,6 +95,7 @@ jobs:
           ls -l out/
           npm publish ./out/reversense-dexcalibur-agent-${TAG}.tgz --registry=https://registry.npmjs.org/
       - id: github-publish
+        name: Publish to GitHub
         env:
           TAG: ${{ inputs.tag_name || github.event.release.tag_name }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
