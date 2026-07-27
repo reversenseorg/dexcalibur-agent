@@ -84,6 +84,8 @@ jobs:
       - id: npmjs-publish
         run: |
           rm -f ~/.npmrc
+          ls -la out/
+          la -la .
           npm publish ./out/reversense-dexcalibur-agent-${TAG}.tgz --registry=https://registry.npmjs.org/
       - id: github-publish
         env:
