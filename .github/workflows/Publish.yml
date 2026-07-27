@@ -81,15 +81,17 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ needs.build.outputs.node_version }}
-      - run: |
+      - id: npmjs-publish
+        run: |
           rm -f ~/.npmrc
-          npm publish out/reversense-dexcalibur-agent-*.tgz --registry=https://registry.npmjs.org/ --access public
-      - env:
+          npm publish ./out/reversense-dexcalibur-agent-${TAG}.tgz --registry=https://registry.npmjs.org/
+      - id: github-publish
+        env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           rm -f ~/.npmrc
           echo '//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}' > ~/.npmrc
-          npm publish out/reversenseorg-dexcalibur-agent-*.tgz --registry=https://npm.pkg.github.com/ --access public
+          npm publish ./out/reversenseorg-dexcalibur-agent-${TAG}.tgz --registry=https://npm.pkg.github.com/
 
 
   notify-discord:
