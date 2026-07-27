@@ -27,6 +27,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    outputs:
+      node_version: ${{ steps.nvmrc.outputs.version }}
     steps:
       - uses: actions/checkout@v6
         with: { persist-credentials: false }
@@ -36,6 +38,8 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           scope: '@reversense'
           package-manager-cache: false  # never use caching in release builds
+      - id: nvmrc
+        run: echo "version=$(cat .nvmrc | cut -b2-)" >> "$GITHUB_OUTPUT"
       - name: Install global deps
         run: npm install -g webpack webpack-cli
       - name: Install dependencies
@@ -75,7 +79,8 @@ jobs:
       - uses: actions/download-artifact@v4
         with: { name: tarballs, path: out/ }
       - uses: actions/setup-node@v4
-        with: { node-version-file: '.nvmrc' }
+        with:
+          node-version: ${{ needs.detect-node-version.outputs.node_version }}
       - run: |
           rm -f ~/.npmrc
           npm publish out/reversense-dexcalibur-agent-*.tgz --registry=https://registry.npmjs.org/ --access public
