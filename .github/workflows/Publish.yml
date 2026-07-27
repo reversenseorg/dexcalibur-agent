@@ -15,7 +15,7 @@ on:
         required: false
         type: boolean
 env:
-  TAG: ${{ inputs.tag || github.event.release.tag_name }}
+  TAG: ${{ inputs.tag_name || github.event.release.tag_name }}
 
 permissions:
   id-token: write  # Required for OIDC
@@ -81,13 +81,16 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ needs.build.outputs.node_version }}
-      - id: npmjs-publish
+      - id: npmjs-publis
+        env:
+          TAG: ${{ inputs.tag_name || github.event.release.tag_name }}
         run: |
           rm -f ~/.npmrc
           ls -l out/
           npm publish ./out/reversense-dexcalibur-agent-${TAG}.tgz --registry=https://registry.npmjs.org/
       - id: github-publish
         env:
+          TAG: ${{ inputs.tag_name || github.event.release.tag_name }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           rm -f ~/.npmrc
