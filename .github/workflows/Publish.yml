@@ -3,7 +3,7 @@ name: Publish
 
 on:
   release:
-    type: ['released']
+    types: ['released']
   workflow_dispatch:
     inputs:
       tag_name:
@@ -83,7 +83,7 @@ jobs:
           node-version: ${{ needs.build.outputs.node_version }}
       - name: npm >= 11.5.1
         run: |
-          npm install -g npm@11.5.1
+          npm install -g npm@latest
           npm --version
       - name: OIDC preflight
         run: |
@@ -95,9 +95,12 @@ jobs:
         env:
           TAG: ${{ inputs.tag_name || github.event.release.tag_name }}
         run: |
-          rm -f ~/.npmrc
-          ls -l out/
-          npm publish ./out/reversense-dexcalibur-agent-${TAG}.tgz --registry=https://registry.npmjs.org/
+          echo "USERCONFIG=${NPM_CONFIG_USERCONFIG:-$HOME/.npmrc}"
+          npm config get //registry.npmjs.org/:_authToken
+          sed -i '/_authToken/d' "${NPM_CONFIG_USERCONFIG:-$HOME/.npmrc}" 2>/dev/null || true
+          npm publish ./out/reversense-dexcalibur-agent-${TAG#v}.tgz --registry=https://registry.npmjs.org/ \
+            --access public \
+            --loglevel=verbose 2>&1
       - id: github-publish
         name: Publish to GitHub
         env:
@@ -106,7 +109,7 @@ jobs:
         run: |
           rm -f ~/.npmrc
           echo '//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}' > ~/.npmrc
-          npm publish ./out/reversenseorg-dexcalibur-agent-${TAG}.tgz --registry=https://npm.pkg.github.com/
+          npm publish ./out/reversenseorg-dexcalibur-agent-${TAG#v}.tgz --registry=https://npm.pkg.github.com/
 
 
   notify-discord:
